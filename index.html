@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yılan Oyunu</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="game-container">
+        <canvas id="gameCanvas"></canvas>
+        <div id="ui-layer">
+            <div id="score">Skor: 0</div>
+            <div id="highscore">Rekor: 0</div>
+        </div>
+        <div id="game-over-screen" class="hidden">
+            <h1>Oyun Bitti</h1>
+            <p>Skorunuz: <span id="final-score">0</span></p>
+            <p>Yeniden başlamak için tıklayın.</p>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
