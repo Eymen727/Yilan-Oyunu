@@ -12,12 +12,9 @@ const ctx = canvas.getContext('2d');
 const WORLD_WIDTH = 3000;
 const WORLD_HEIGHT = 3000;
 const SNAKE_SPEED = 5;
-const SNAKE_BOOST_SPEED = 10;
 const SNAKE_SIZE = 20;
 const FOOD_SIZE = 15;
 const CAKE_SIZE = 30;
-const INVINCIBILITY_DURATION = 5000; // 5 seconds
-const SCORE_DECREASE_RATE = 1; // points per second while boosting
 
 // Game State
 let player = {
@@ -26,10 +23,7 @@ let player = {
     dx: SNAKE_SPEED,
     dy: 0,
     body: [],
-    size: 5,
-    isBoosting: false,
-    invincible: false,
-    invincibilityTimer: 0
+    size: 5
 };
 let foods = [];
 let cakes = [];
@@ -64,8 +58,6 @@ function startNewGame() {
         dy: 0,
         body: [],
         size: 5,
-        isBoosting: false,
-        invincible: true,
     };
     
     // Reset game state
@@ -77,11 +69,6 @@ function startNewGame() {
 
     // Hide game over screen
     gameOverScreen.classList.add('hidden');
-
-    // Start invincibility timer
-    setTimeout(() => {
-        player.invincible = false;
-    }, INVINCIBILITY_DURATION);
 
     // Initial food generation
     for (let i = 0; i < 100; i++) {
@@ -116,12 +103,6 @@ function update() {
         player.body.pop();
     }
 
-    // Score penalty for boosting
-    if (player.isBoosting && score > 0) {
-        score -= (SCORE_DECREASE_RATE / 60); // Decrease score based on frame rate
-        updateScore();
-    }
-
     // Update camera to follow player
     camera.x = player.x - canvas.width / 2;
     camera.y = player.y - canvas.height / 2;
@@ -145,18 +126,6 @@ function update() {
     // Check for wall collision
     if (player.x < 0 || player.x > WORLD_WIDTH || player.y < 0 || player.y > WORLD_HEIGHT) {
         gameOver();
-    }
-
-    // Check for self collision (if not invincible)
-    if (!player.invincible) {
-        // Start check from the 4th segment to avoid immediate self-collision with the neck
-        for (let i = 4; i < player.body.length; i++) {
-            const dist = Math.hypot(player.x - player.body[i].x, player.y - player.body[i].y);
-            if (dist < SNAKE_SIZE) {
-                gameOver();
-                break;
-            }
-        }
     }
 }
 
@@ -192,12 +161,8 @@ function draw() {
 
     // Draw player
     player.body.forEach((segment, index) => {
-        // Head is brighter, and changes color if invincible
-        if (index === 0) {
-            ctx.fillStyle = player.invincible ? 'cyan' : 'lime';
-        } else {
-            ctx.fillStyle = '#4CAF50';
-        }
+        // Head is brighter
+        ctx.fillStyle = index === 0 ? 'lime' : '#4CAF50';
         // Tail gets smaller
         const scale = 1 - (index / (player.body.length * 1.5));
         const segmentSize = SNAKE_SIZE * scale;
@@ -276,51 +241,35 @@ window.addEventListener('resize', () => {
 });
 
 window.addEventListener('keydown', e => {
-    // Boosting
-    if (['ArrowUp', 'w', 'ArrowDown', 's', 'ArrowLeft', 'a', 'ArrowRight', 'd'].includes(e.key)) {
-        player.isBoosting = true;
-    }
-
-    const currentSpeed = player.isBoosting ? SNAKE_BOOST_SPEED : SNAKE_SPEED;
     switch (e.key) {
         case 'ArrowUp':
         case 'w':
             if (player.dy === 0) { // Prevent reversing
                 player.dx = 0;
-                player.dy = -currentSpeed;
+                player.dy = -SNAKE_SPEED;
             }
             break;
         case 'ArrowDown':
         case 's':
             if (player.dy === 0) { // Prevent reversing
                 player.dx = 0;
-                player.dy = currentSpeed;
+                player.dy = SNAKE_SPEED;
             }
             break;
         case 'ArrowLeft':
         case 'a':
             if (player.dx === 0) { // Prevent reversing
-                player.dx = -currentSpeed;
+                player.dx = -SNAKE_SPEED;
                 player.dy = 0;
             }
             break;
         case 'ArrowRight':
         case 'd':
             if (player.dx === 0) { // Prevent reversing
-                player.dx = currentSpeed;
+                player.dx = SNAKE_SPEED;
                 player.dy = 0;
             }
             break;
-    }
-});
-
-window.addEventListener('keyup', e => {
-    // Stop boosting
-    if (['ArrowUp', 'w', 'ArrowDown', 's', 'ArrowLeft', 'a', 'ArrowRight', 'd'].includes(e.key)) {
-        player.isBoosting = false;
-        // Reset speed to normal
-        if (player.dx !== 0) player.dx = Math.sign(player.dx) * SNAKE_SPEED;
-        if (player.dy !== 0) player.dy = Math.sign(player.dy) * SNAKE_SPEED;
     }
 });
 
