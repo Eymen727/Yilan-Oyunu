@@ -3,6 +3,7 @@ const canvas = document.getElementById('gameCanvas');
 const scoreElement = document.getElementById('score');
 const highscoreElement = document.getElementById('highscore');
 const gameOverScreen = document.getElementById('game-over-screen');
+const pauseScreen = document.getElementById('pause-screen');
 const finalScoreElement = document.getElementById('final-score');
 
 // Canvas Context
@@ -30,6 +31,7 @@ let cakes = [];
 let score = 0;
 let highscore = localStorage.getItem('highscore') || 0;
 let isGameOver = false;
+let isPaused = false;
 
 // Camera
 let camera = {
@@ -82,6 +84,7 @@ function startNewGame() {
 // --- Game Loop ---
 function gameLoop() {
     if (isGameOver) return;
+    if (isPaused) return;
 
     update();
     draw();
@@ -193,6 +196,18 @@ function restartGame() {
     gameLoop();
 }
 
+// --- Pause and Unpause ---
+function pauseGame() {
+    isPaused = true;
+    pauseScreen.classList.remove('hidden');
+}
+
+function unpauseGame() {
+    isPaused = false;
+    pauseScreen.classList.add('hidden');
+    gameLoop();
+}
+
 // --- Helper Functions ---
 function updateScore() {
     scoreElement.textContent = `Skor: ${Math.floor(score)}`;
@@ -234,6 +249,7 @@ function spawnCake() {
 
 // --- Event Listeners ---
 gameOverScreen.addEventListener('click', restartGame);
+pauseScreen.addEventListener('click', unpauseGame);
 
 window.addEventListener('resize', () => {
     canvas.width = window.innerWidth;
@@ -244,30 +260,40 @@ window.addEventListener('keydown', e => {
     switch (e.key) {
         case 'ArrowUp':
         case 'w':
-            if (player.dy === 0) { // Prevent reversing
+            if (player.dy === 0 && !isPaused && !isGameOver) { // Prevent reversing
                 player.dx = 0;
                 player.dy = -SNAKE_SPEED;
             }
             break;
         case 'ArrowDown':
         case 's':
-            if (player.dy === 0) { // Prevent reversing
+            if (player.dy === 0 && !isPaused && !isGameOver) { // Prevent reversing
                 player.dx = 0;
                 player.dy = SNAKE_SPEED;
             }
             break;
         case 'ArrowLeft':
         case 'a':
-            if (player.dx === 0) { // Prevent reversing
+            if (player.dx === 0 && !isPaused && !isGameOver) { // Prevent reversing
                 player.dx = -SNAKE_SPEED;
                 player.dy = 0;
             }
             break;
         case 'ArrowRight':
         case 'd':
-            if (player.dx === 0) { // Prevent reversing
+            if (player.dx === 0 && !isPaused && !isGameOver) { // Prevent reversing
                 player.dx = SNAKE_SPEED;
                 player.dy = 0;
+            }
+            break;
+        case 'p':
+        case 'P':
+            if (!isGameOver) {
+                if (isPaused) {
+                    unpauseGame();
+                } else {
+                    pauseGame();
+                }
             }
             break;
     }
