@@ -24,3 +24,4 @@ Bu dosya, geliştirdiğimiz yılan oyununun nasıl oynanacağına dair temel bil
 -   **Rekor Kırma:** Oyun bittiğinde elde ettiğiniz skor gösterilir. Eğer önceki en yüksek skorunuzu geçtiyseniz, yeni rekorunuz kaydedilir. Amacınız, her oyunda kendi rekorunuzu kırmaktır!
 
 İyi eğlenceler! 🐍
+https://drive.google.com/drive/folders/1GbumxcjQVNMopXfC7Bq68oUTMA1XzgNv?usp=drive_link
